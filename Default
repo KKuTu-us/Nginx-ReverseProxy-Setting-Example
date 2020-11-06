@@ -1,0 +1,38 @@
+server {
+    listen (Port you want) ssl;
+
+    server_name (Hostname you want)
+
+    ssl on;
+    ssl_certificate (SSL Certificate Location);
+    ssl_certificate_key (SSL certificate key location);
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-S$    ssl_prefer_server_ciphers off;
+    ssl_stapling on;
+    ssl_stapling_verify on;
+
+    #prevent 502 bad gateway
+    #large_client_header_buffers 8 32;
+
+    location / {
+
+        # prevents 502 bad gateway error
+        proxy_buffers 8 32k;
+        proxy_buffer_size 64k;
+
+        # Enable Reverse Proxy
+        proxy_pass (Origin);
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        #proxy_set_header X-NginX-Proxy true;
+
+        # Websocket
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        proxy_read_timeout 999999999;
+
+    }
+}
